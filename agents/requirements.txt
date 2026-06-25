@@ -1,0 +1,32 @@
+# OpsIQ AI Agents - Python Dependencies
+# These agents can run locally or be deployed to Azure Functions
+
+# Core dependencies
+python>=3.9
+
+# Data processing and analysis
+pandas>=1.5.0
+numpy>=1.24.0
+
+# Azure services (optional, for production deployment)
+azure-storage-blob>=12.15.0
+azure-identity>=1.13.0
+azure-ai-documentintelligence>=1.0.0
+azure-ai-openai>=1.0.0
+azure-data-tables>=12.12.0
+
+# ML and predictive analytics
+scikit-learn>=1.3.0
+scipy>=1.10.0
+
+# API and utilities
+requests>=2.31.0
+python-dateutil>=2.8.0
+pytz>=2023.3
+
+# Logging and monitoring
+python-json-logger>=2.0.0
+
+# Optional: For testing
+pytest>=7.4.0
+pytest-cov>=4.1.0

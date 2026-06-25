@@ -1,0 +1,1450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpsIQ - Operations Intelligence Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Poppins:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #f1f5f9;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
+            --border-color: #e2e8f0;
+            --accent-color: #0891b2;
+            --status-live: #d1fae5;
+            --status-live-text: #047857;
+        }
+        
+        html.dark-mode {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-tertiary: #94a3b8;
+            --border-color: #334155;
+            --accent-color: #06b6d4;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Glittering background animation */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(137, 29, 226, 0.05) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(59, 130, 246, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+            animation: glitter 8s ease-in-out infinite;
+        }
+        
+        @keyframes glitter {
+            0%, 100% {
+                opacity: 0.3;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1.05);
+            }
+        }
+        
+        /* Floating particles */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                radial-gradient(2px 2px at 20% 30%, rgba(6, 182, 212, 0.2), transparent),
+                radial-gradient(2px 2px at 60% 70%, rgba(137, 29, 226, 0.2), transparent),
+                radial-gradient(1px 1px at 50% 50%, rgba(59, 130, 246, 0.2), transparent),
+                radial-gradient(1px 1px at 80% 10%, rgba(168, 85, 247, 0.2), transparent),
+                radial-gradient(2px 2px at 90% 60%, rgba(236, 72, 153, 0.2), transparent);
+            background-repeat: repeat;
+            background-size: 200% 200%, 150% 150%, 300% 300%, 250% 250%, 200% 200%;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% {
+                background-position: 0% 0%, 0% 0%, 0% 0%, 0% 0%, 0% 0%;
+            }
+            100% {
+                background-position: 100% 100%, 100% 100%, 100% 100%, 100% 100%, 100% 100%;
+            }
+        }
+        
+        header, nav, main, .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .header-title {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header-title p {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+        
+        .header-meta {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            font-size: 0.95rem;
+        }
+        
+        .badge {
+            background: var(--status-live);
+            color: var(--status-live-text);
+            padding: 0.6rem 1rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            letter-spacing: 0.3px;
+            box-shadow: 0 2px 8px rgba(4, 120, 87, 0.2);
+        }
+        
+        /* Dark Mode Toggle */
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background: var(--bg-tertiary);
+            padding: 0.5rem;
+            border-radius: 9999px;
+            cursor: pointer;
+            border: 1px solid var(--border-color);
+            transition: all 0.3s ease;
+        }
+        
+        .theme-toggle:hover {
+            box-shadow: 0 2px 8px rgba(6, 182, 212, 0.2);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 28px;
+            background: var(--text-tertiary);
+            border-radius: 9999px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            padding: 0;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 24px;
+            height: 24px;
+            background: var(--bg-secondary);
+            border-radius: 9999px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .toggle-switch:hover {
+            box-shadow: 0 0 12px rgba(6, 182, 212, 0.3);
+        }
+        
+        html.dark-mode .toggle-switch {
+            background: var(--accent-color);
+        }
+        
+        html.dark-mode .toggle-switch::after {
+            left: 24px;
+        }
+        
+        .theme-icon {
+            font-size: 1.2rem;
+            transition: transform 0.3s ease;
+        }
+        
+        nav {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 2rem;
+            display: flex;
+            gap: 3rem;
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            backdrop-filter: blur(10px);
+        }
+        
+        nav button {
+            background: none;
+            border: none;
+            padding: 1.2rem 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.3px;
+        }
+        
+        nav button:hover {
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+        
+        nav button.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+        
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 2.5rem;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+        
+        .kpi-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .kpi-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+            border-color: var(--accent-color);
+        }
+        
+        .kpi-label {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+        }
+        
+        .kpi-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -1px;
+        }
+        
+        .kpi-unit {
+            font-size: 1.1rem;
+            color: var(--text-tertiary);
+            margin-left: 0.6rem;
+            font-weight: 400;
+        }
+        
+        .kpi-target {
+            font-size: 0.85rem;
+            color: var(--text-tertiary);
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+        
+        .kpi-trend {
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            font-weight: 700;
+        }
+        
+        .trend-positive {
+            color: #059669;
+        }
+        
+        .trend-negative {
+            color: #dc2626;
+        }
+        
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+        
+        .section:hover {
+            border-color: var(--accent-color);
+            box-shadow: 0 4px 16px rgba(6, 182, 212, 0.1);
+        }
+        
+        .section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+        }
+        
+        h2 {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-primary), var(--accent-color));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            border-bottom: 2px solid var(--border-color);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.2px;
+        }
+        
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        tbody tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .status-tracker-wrap {
+            overflow-x: auto;
+            margin-top: 1rem;
+        }
+
+        .status-tracker-table {
+            min-width: 980px;
+        }
+
+        .breach-pill {
+            display: inline-block;
+            padding: 0.3rem 0.7rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+        }
+
+        .breach-none {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .breach-watch {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .breach-risk {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .breach-critical {
+            background: #7f1d1d;
+            color: #fecaca;
+        }
+
+        .tracker-action-btn {
+            border: none;
+            border-radius: 0.6rem;
+            padding: 0.5rem 0.85rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.2px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tracker-action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .tracker-action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .tracker-action-primary {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+
+        .tracker-action-warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .tracker-action-danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .tracker-feedback {
+            margin-top: 1rem;
+            padding: 0.85rem 1rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+        }
+
+        .tracker-feedback.show {
+            display: block;
+        }
+
+        .tracker-feedback.success {
+            background: #dcfce7;
+            border-color: #86efac;
+            color: #166534;
+        }
+
+        .tracker-feedback.error {
+            background: #fee2e2;
+            border-color: #fca5a5;
+            color: #991b1b;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.4rem 0.85rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            transition: all 0.2s ease;
+        }
+        
+        .status-badge:hover {
+            transform: scale(1.05);
+        }
+        
+        .status-live {
+            background: var(--status-live);
+            color: var(--status-live-text);
+        }
+        
+        .status-planned {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+        
+        .status-active {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-paid {
+            background: var(--status-live);
+            color: var(--status-live-text);
+        }
+        
+        .status-pending {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-past-due {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-high {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+        
+        .status-medium {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent-color);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.2);
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+        }
+        
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            font-size: 1.05rem;
+            letter-spacing: -0.2px;
+        }
+        
+        .card-meta {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            font-style: italic;
+        }
+        
+        .card-badges {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+        }
+        
+        .chatbot-button {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 4rem;
+            height: 4rem;
+            border-radius: 9999px;
+            background: linear-gradient(135deg, var(--accent-color), #8b5cf6);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+            transition: all 0.3s ease;
+            z-index: 50;
+        }
+        
+        .chatbot-button:hover {
+            transform: scale(1.15) rotateZ(10deg);
+            box-shadow: 0 12px 32px rgba(6, 182, 212, 0.6);
+        }
+        
+        .chatbot-button:active {
+            transform: scale(0.95);
+        }
+        
+        .chart-placeholder {
+            background: var(--bg-tertiary);
+            border-radius: 0.75rem;
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.95rem;
+            margin: 1.5rem 0;
+            border: 2px dashed var(--border-color);
+            font-style: italic;
+        }
+        
+        .grid-2col {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        /* Architecture Flow Styles */
+        .architecture-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin: 2rem 0;
+        }
+        
+        .flow-stage {
+            flex: 0 1 auto;
+        }
+        
+        .flow-box {
+            background: var(--bg-secondary);
+            border: 2px solid var(--accent-color);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            min-width: 160px;
+            text-align: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(6, 182, 212, 0.1);
+        }
+        
+        .flow-box:hover {
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.25);
+            border-color: #8b5cf6;
+        }
+        
+        .flow-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .flow-title {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .flow-desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        
+        .flow-arrow {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--accent-color);
+            opacity: 0.7;
+        }
+        
+        /* Tech Stack Grid */
+        .tech-stack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .tech-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.15);
+            border-color: var(--accent-color);
+        }
+        
+        .tech-card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(139, 92, 246, 0.05));
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .tech-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+        
+        .tech-name {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .tech-category {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 0.25rem;
+        }
+        
+        .tech-details {
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+        
+        .tech-feature {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            line-height: 1.5;
+        }
+        
+        /* Integration Table */
+        .integration-table {
+            overflow-x: auto;
+            margin-top: 1.5rem;
+        }
+        
+        .integration-table table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        
+        .integration-table th {
+            background: linear-gradient(135deg, var(--bg-tertiary), rgba(6, 182, 212, 0.05));
+            border-bottom: 2px solid var(--accent-color);
+            padding: 1.2rem;
+            text-align: left;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.3px;
+        }
+        
+        .integration-table td {
+            padding: 1.2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .integration-table tbody tr {
+            transition: all 0.2s ease;
+        }
+        
+        .integration-table tbody tr:hover {
+            background: var(--bg-tertiary);
+            transform: scale(1.01);
+        }
+    </style>
+<body>
+    <header>
+        <div class="header-title">
+            <h1>OpsIQ</h1>
+            <p>Operations Intelligence Platform</p>
+        </div>
+        <div class="header-meta">
+            <span class="badge">5 AI Agents Live</span>
+            <span>Jun 22, 2026</span>
+            <div class="theme-toggle" onclick="toggleDarkMode(event)">
+                <span class="theme-icon" id="theme-icon">🌙</span>
+                <button class="toggle-switch" id="toggle-btn"></button>
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <button class="nav-btn active" onclick="switchTab('overview')">Overview</button>
+        <button class="nav-btn" onclick="switchTab('p2p')">Procure to Pay</button>
+        <button class="nav-btn" onclick="switchTab('ap')">AP & Invoicing</button>
+        <button class="nav-btn" onclick="switchTab('recruiting')">Recruiting</button>
+        <button class="nav-btn" onclick="switchTab('vendor')">Vendor & Engineering</button>
+        <button class="nav-btn" onclick="switchTab('arch')">Architecture</button>
+    </nav>
+    
+    <div class="container">
+        <!-- OVERVIEW TAB -->
+        <div id="overview" class="tab-content active">
+            <h2>Key Performance Indicators</h2>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-label">P2P Cycle</div>
+                    <div class="kpi-value">68<span class="kpi-unit">days</span></div>
+                    <div class="kpi-target">Target: 60 days</div>
+                    <div class="kpi-trend trend-positive">↓ -50 days since Jan</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Recruiting Cycle</div>
+                    <div class="kpi-value">35<span class="kpi-unit">days</span></div>
+                    <div class="kpi-target">Target: 28 days</div>
+                    <div class="kpi-trend trend-positive">↓ -17 days since Jan</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">AP Aging</div>
+                    <div class="kpi-value">$332K</div>
+                    <div class="kpi-target">88 invoices open</div>
+                    <div class="kpi-trend">Target: <$250K</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Invoices</div>
+                    <div class="kpi-value">196<span class="kpi-unit">inv</span></div>
+                    <div class="kpi-target">Target: <220</div>
+                    <div class="kpi-trend trend-negative">↑ +54 since Jan</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Active Vendors</div>
+                    <div class="kpi-value">84<span class="kpi-unit">vendors</span></div>
+                    <div class="kpi-target">34 fully evaluated</div>
+                    <div class="kpi-trend">Target: 100+</div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-label">Discount Capture</div>
+                    <div class="kpi-value">4.5<span class="kpi-unit">%</span></div>
+                    <div class="kpi-target">Target: 5%</div>
+                    <div class="kpi-trend trend-positive">↑ +3.3% since Jan</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h3>Status-Wise Tracker (Time Limit Actions)</h3>
+                <div class="status-tracker-wrap">
+                    <table class="status-tracker-table">
+                        <thead>
+                            <tr>
+                                <th>Status Group</th>
+                                <th>Items</th>
+                                <th>Time Limit</th>
+                                <th>Current Elapsed</th>
+                                <th>Breach Level</th>
+                                <th>Suggested Action</th>
+                                <th>Take Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>On Track</strong></td>
+                                <td>126</td>
+                                <td>7 days</td>
+                                <td>2.1 days avg</td>
+                                <td><span class="breach-pill breach-none">No Breach</span></td>
+                                <td>Continue monitoring</td>
+                                <td><button class="tracker-action-btn tracker-action-primary" onclick="handleTrackerAction('On Track', 'Review Queue', this)">Review Queue</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Warning</strong></td>
+                                <td>29</td>
+                                <td>5 days</td>
+                                <td>4.6 days avg</td>
+                                <td><span class="breach-pill breach-watch">Approaching Limit</span></td>
+                                <td>Assign owner and follow up</td>
+                                <td><button class="tracker-action-btn tracker-action-warning" onclick="handleTrackerAction('Warning', 'Assign Owner', this)">Assign Owner</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Exceeded</strong></td>
+                                <td>11</td>
+                                <td>3 days</td>
+                                <td>5.8 days avg</td>
+                                <td><span class="breach-pill breach-risk">SLA Breach</span></td>
+                                <td>Escalate to operations lead</td>
+                                <td><button class="tracker-action-btn tracker-action-danger" onclick="handleTrackerAction('Exceeded', 'Escalate to Ops Lead', this)">Escalate</button></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Critical</strong></td>
+                                <td>4</td>
+                                <td>24 hours</td>
+                                <td>47 hours avg</td>
+                                <td><span class="breach-pill breach-critical">Critical Breach</span></td>
+                                <td>Start incident bridge immediately</td>
+                                <td><button class="tracker-action-btn tracker-action-danger" onclick="handleTrackerAction('Critical', 'Open Incident Bridge', this)">Open Incident</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="tracker-feedback" class="tracker-feedback"></div>
+            </div>
+            
+            <div class="grid-2col">
+                <div class="section">
+                    <h3>P2P Cycle Trend</h3>
+                    <div class="chart-placeholder">
+                        📊 Interactive Line Chart<br/>
+                        <small>(Jan 118d → Jun 68d)</small>
+                    </div>
+                </div>
+                <div class="section">
+                    <h3>Invoice Volume & Processing</h3>
+                    <div class="chart-placeholder">
+                        📊 Interactive Bar Chart<br/>
+                        <small>Monthly invoices vs processed</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h3>AI Agents (12 Total)</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Invoice Review</div>
+                        <div class="card-meta">AP & Invoicing</div>
+                        <div><span class="status-badge status-live">Live</span> 94% accuracy</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Resume Screening</div>
+                        <div class="card-meta">Recruiting</div>
+                        <div><span class="status-badge status-live">Live</span> 89% accuracy</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Vendor Assessment</div>
+                        <div class="card-meta">Vendor Mgmt</div>
+                        <div><span class="status-badge status-live">Live</span> 91% accuracy</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Compliance Check</div>
+                        <div class="card-meta">P2P</div>
+                        <div><span class="status-badge status-live">Live</span> 96% accuracy</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Market Research</div>
+                        <div class="card-meta">Procurement</div>
+                        <div><span class="status-badge status-live">Live</span> 87% accuracy</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">SOW Generator</div>
+                        <div class="card-meta">Procurement</div>
+                        <div><span class="status-badge status-planned">Planned</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- P2P TAB -->
+        <div id="p2p" class="tab-content">
+            <h2>Procure to Pay Lifecycle</h2>
+            <div class="section">
+                <h3>P2P Process Stages</h3>
+                <table>
+                    <thead>
+                        <tr><th>Stage</th><th>In Progress</th><th>Avg Days</th><th>Status</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Requisition</td><td>24</td><td>3d</td><td><span class="status-badge" style="background: #d1fae5; color: #047857;">✓ On Track</span></td></tr>
+                        <tr><td>Buyer Review</td><td>18</td><td>2d</td><td><span class="status-badge" style="background: #d1fae5; color: #047857;">✓ On Track</span></td></tr>
+                        <tr><td>Approval</td><td>12</td><td>5d</td><td><span class="status-badge" style="background: #fee2e2; color: #dc2626;">⚠ Delayed</span></td></tr>
+                        <tr><td>PO Creation</td><td>8</td><td>2d</td><td><span class="status-badge" style="background: #d1fae5; color: #047857;">✓ On Track</span></td></tr>
+                        <tr><td>Supplier Response</td><td>5</td><td>14d</td><td><span class="status-badge" style="background: #fee2e2; color: #dc2626;">⚠ Delayed</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- AP TAB -->
+        <div id="ap" class="tab-content">
+            <h2>AP & Invoicing</h2>
+            <div class="section">
+                <h3>Open Invoices & Aging</h3>
+                <table>
+                    <thead>
+                        <tr><th>Invoice ID</th><th>Vendor</th><th>Amount</th><th>Status</th><th>Days Overdue</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>INV-2024-001</td><td>Nexa Corp</td><td>$45,230</td><td><span class="status-badge status-paid">Paid</span></td><td>—</td></tr>
+                        <tr><td>INV-2024-003</td><td>Atlas Global</td><td>$67,890</td><td><span class="status-badge status-pending">Pending</span></td><td>—</td></tr>
+                        <tr><td>INV-2024-004</td><td>Kappa Tech</td><td>$12,340</td><td><span class="status-badge status-past-due">Past Due</span></td><td>5d</td></tr>
+                        <tr><td>INV-2024-005</td><td>Mira Systems</td><td>$34,560</td><td><span class="status-badge status-past-due">Past Due</span></td><td>12d</td></tr>
+                        <tr><td>INV-2024-006</td><td>Delta Supplies</td><td>$23,100</td><td><span class="status-badge status-past-due">Past Due</span></td><td>38d</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- RECRUITING TAB -->
+        <div id="recruiting" class="tab-content">
+            <h2>Recruiting Lifecycle</h2>
+            <div class="section">
+                <h3>Top 5 AI-Screened Candidates</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <div class="card-title">Alice Johnson</div>
+                        <div class="card-meta">Senior Procurement Analyst</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2; margin: 0.5rem 0;">94%</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">AI Score: 1-click • Match: 92%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Bob Chen</div>
+                        <div class="card-meta">Supply Chain Manager</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2; margin: 0.5rem 0;">88%</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">AI Score: 2-min • Match: 87%</div>
+                    </div>
+                    <div class="card">
+                        <div class="card-title">Carol Davis</div>
+                        <div class="card-meta">Vendor Manager</div>
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #0891b2; margin: 0.5rem 0;">85%</div>
+                        <div style="font-size: 0.75rem; color: #64748b;">AI Score: 5-min • Match: 84%</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VENDOR TAB -->
+        <div id="vendor" class="tab-content">
+            <h2>Vendor & Engineering</h2>
+            <div class="section">
+                <h3>Top 5 Vendor Scores</h3>
+                <table>
+                    <thead>
+                        <tr><th>Vendor</th><th>Score</th><th>Tier</th><th>Orders</th><th>Discount</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td><strong>Nexa Corp</strong></td><td><strong>94</strong></td><td>Preferred</td><td>156</td><td><span style="color: #059669; font-weight: 600;">12.5%</span></td></tr>
+                        <tr><td><strong>Proxima Inc</strong></td><td><strong>87</strong></td><td>Preferred</td><td>98</td><td><span style="color: #059669; font-weight: 600;">8.2%</span></td></tr>
+                        <tr><td><strong>Atlas Global</strong></td><td><strong>79</strong></td><td>Evaluated</td><td>45</td><td><span style="color: #059669; font-weight: 600;">5.1%</span></td></tr>
+                        <tr><td><strong>Kappa Tech</strong></td><td><strong>71</strong></td><td>Evaluated</td><td>32</td><td><span style="color: #059669; font-weight: 600;">3.7%</span></td></tr>
+                        <tr><td><strong>Mira Systems</strong></td><td><strong>63</strong></td><td>Standard</td><td>18</td><td><span style="color: #059669; font-weight: 600;">2.1%</span></td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="section">
+                <h3>Self-Perform vs SubK Analysis</h3>
+                <table>
+                    <thead>
+                        <tr><th>Work Type</th><th>Currently SubK</th><th>AI Recommendation</th><th>Efficiency</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>Site Design</td><td>45%</td><td><span class="status-badge" style="background: #f3f4f6; color: #6b7280;">Keep SubK</span></td><td>85%</td></tr>
+                        <tr><td>Civil Works</td><td>60%</td><td><span class="status-badge" style="background: #dbeafe; color: #1e40af;">Increase Self</span></td><td>72%</td></tr>
+                        <tr><td>HVAC Systems</td><td>80%</td><td><span class="status-badge" style="background: #f3f4f6; color: #6b7280;">Keep SubK</span></td><td>90%</td></tr>
+                        <tr><td>Electrical</td><td>55%</td><td><span class="status-badge" style="background: #dbeafe; color: #1e40af;">Self-Perform</span></td><td>78%</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- ARCHITECTURE TAB -->
+        <div id="arch" class="tab-content">
+            <h2>Architecture & Tech Stack</h2>
+            
+            <!-- Architecture Flow Diagram -->
+            <div class="section" style="margin-bottom: 2rem;">
+                <h3>Data Flow Architecture</h3>
+                <div class="architecture-flow">
+                    <!-- Row 1: Data Ingestion -->
+                    <div class="flow-stage">
+                        <div class="flow-box">
+                            <div class="flow-icon">📁</div>
+                            <div class="flow-title">Data Ingestion</div>
+                            <div class="flow-desc">Azure Blob Storage</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    
+                    <!-- Row 2: Processing -->
+                    <div class="flow-stage">
+                        <div class="flow-box">
+                            <div class="flow-icon">🔄</div>
+                            <div class="flow-title">Processing</div>
+                            <div class="flow-desc">Document Intelligence</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    
+                    <!-- Row 3: AI Analysis -->
+                    <div class="flow-stage">
+                        <div class="flow-box">
+                            <div class="flow-icon">🧠</div>
+                            <div class="flow-title">AI Analysis</div>
+                            <div class="flow-desc">Azure OpenAI (12 Agents)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Row 2 of Flow -->
+                <div class="architecture-flow" style="margin-top: 3rem;">
+                    <div style="flex: 1;"></div>
+                    <div class="flow-arrow" style="writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 1rem;">↓</div>
+                    <div style="flex: 1;"></div>
+                    <div class="flow-arrow" style="writing-mode: vertical-rl; transform: rotate(180deg); margin: 0 1rem;">↓</div>
+                    <div style="flex: 1;"></div>
+                </div>
+                
+                <!-- Row 3 of Flow: Storage & Analytics -->
+                <div class="architecture-flow" style="margin-top: 1rem;">
+                    <div class="flow-stage">
+                        <div class="flow-box" style="background: var(--bg-tertiary);">
+                            <div class="flow-icon">💾</div>
+                            <div class="flow-title">Data Warehouse</div>
+                            <div class="flow-desc">Databricks</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    
+                    <div class="flow-stage">
+                        <div class="flow-box" style="background: var(--bg-tertiary);">
+                            <div class="flow-icon">📊</div>
+                            <div class="flow-title">Visualization</div>
+                            <div class="flow-desc">Power BI</div>
+                        </div>
+                    </div>
+                    <div class="flow-arrow">→</div>
+                    
+                    <div class="flow-stage">
+                        <div class="flow-box" style="background: var(--bg-tertiary);">
+                            <div class="flow-icon">🎨</div>
+                            <div class="flow-title">Dashboard</div>
+                            <div class="flow-desc">OpsIQ Platform</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Component Cards -->
+            <div class="section">
+                <h3>Technology Stack Details</h3>
+                <div class="tech-stack-grid">
+                    <!-- Azure Blob Storage -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #3b82f6;">
+                            <div class="tech-icon" style="background: #dbeafe;">☁️</div>
+                            <div>
+                                <div class="tech-name">Azure Blob Storage</div>
+                                <div class="tech-category">Data Ingestion</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• Scalable cloud storage</div>
+                            <div class="tech-feature">• File ingestion layer</div>
+                            <div class="tech-feature">• Document uploads</div>
+                            <div class="tech-feature">• 99.99% uptime SLA</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Document Intelligence -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #7c3aed;">
+                            <div class="tech-icon" style="background: #ede9fe;">📄</div>
+                            <div>
+                                <div class="tech-name">Document Intelligence</div>
+                                <div class="tech-category">Data Processing</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• OCR & text extraction</div>
+                            <div class="tech-feature">• Form recognition</div>
+                            <div class="tech-feature">• Layout analysis</div>
+                            <div class="tech-feature">• 97% accuracy</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Azure OpenAI -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #ec4899;">
+                            <div class="tech-icon" style="background: #fce7f3;">⚡</div>
+                            <div>
+                                <div class="tech-name">Azure OpenAI</div>
+                                <div class="tech-category">AI & ML Engine</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• 12 specialized agents</div>
+                            <div class="tech-feature">• GPT-4 & embeddings</div>
+                            <div class="tech-feature">• 90%+ accuracy</div>
+                            <div class="tech-feature">• Real-time processing</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Databricks -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #f97316;">
+                            <div class="tech-icon" style="background: #fed7aa;">💎</div>
+                            <div>
+                                <div class="tech-name">Databricks</div>
+                                <div class="tech-category">Data Warehouse</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• Apache Spark engine</div>
+                            <div class="tech-feature">• Data warehousing</div>
+                            <div class="tech-feature">• SQL analytics</div>
+                            <div class="tech-feature">• Petabyte-scale</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Power BI -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #dc2626;">
+                            <div class="tech-icon" style="background: #fee2e2;">📊</div>
+                            <div>
+                                <div class="tech-name">Power BI</div>
+                                <div class="tech-category">Analytics & Reporting</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• Interactive dashboards</div>
+                            <div class="tech-feature">• Real-time analytics</div>
+                            <div class="tech-feature">• 100+ visualizations</div>
+                            <div class="tech-feature">• Drill-down reports</div>
+                        </div>
+                    </div>
+                    
+                    <!-- OpsIQ Platform -->
+                    <div class="tech-card">
+                        <div class="tech-card-header" style="border-left: 4px solid #0891b2;">
+                            <div class="tech-icon" style="background: #cffafe;">🎨</div>
+                            <div>
+                                <div class="tech-name">OpsIQ Platform</div>
+                                <div class="tech-category">Frontend UI</div>
+                            </div>
+                        </div>
+                        <div class="tech-details">
+                            <div class="tech-feature">• React + TypeScript</div>
+                            <div class="tech-feature">• Responsive design</div>
+                            <div class="tech-feature">• Real-time updates</div>
+                            <div class="tech-feature">• Dark/Light mode</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Integration Points -->
+            <div class="section">
+                <h3>API Integration Points</h3>
+                <div class="integration-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 20%;">Component</th>
+                                <th style="width: 30%;">Role</th>
+                                <th style="width: 25%;">API Endpoint</th>
+                                <th style="width: 25%;">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Blob Storage</strong></td>
+                                <td>Document ingestion & retrieval</td>
+                                <td>/api/storage/upload</td>
+                                <td><span class="status-badge status-live">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Document Intelligence</strong></td>
+                                <td>OCR & data extraction</td>
+                                <td>/api/docai/extract</td>
+                                <td><span class="status-badge status-live">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>OpenAI Agents</strong></td>
+                                <td>AI analysis & decision making</td>
+                                <td>/api/agents/{agent-key}</td>
+                                <td><span class="status-badge status-live">Active</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Databricks</strong></td>
+                                <td>Query & warehouse</td>
+                                <td>/api/warehouse/query</td>
+                                <td><span class="status-badge" style="background: #fef3c7; color: #b45309;">Configured</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Power BI</strong></td>
+                                <td>Visualization & reporting</td>
+                                <td>/api/reports/embed</td>
+                                <td><span class="status-badge" style="background: #fef3c7; color: #b45309;">Configured</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <button class="chatbot-button" onclick="alert('💬 Ask OpsIQ Chatbot\n\nAsk about:\n• P2P cycles & trends\n• AP aging & invoices\n• Vendor scores\n• Recruiting candidates\n• AI agents & initiatives\n• Architecture overview')">💬</button>
+    
+    
+    <script>
+        const API_BASE_URL = 'http://localhost:5000';
+
+        // Dark mode toggle
+        function toggleDarkMode(e) {
+            e.stopPropagation();
+            const html = document.documentElement;
+            const icon = document.getElementById('theme-icon');
+            
+            html.classList.toggle('dark-mode');
+            
+            // Save preference
+            localStorage.setItem('theme', html.classList.contains('dark-mode') ? 'dark' : 'light');
+            
+            // Update icon
+            icon.textContent = html.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+        
+        // Load saved theme preference
+        function loadThemePreference() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (savedTheme === null && prefersDark)) {
+                document.documentElement.classList.add('dark-mode');
+                document.getElementById('theme-icon').textContent = '☀️';
+            }
+        }
+        
+        // Load theme on page load
+        loadThemePreference();
+        
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active from all buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active to clicked button
+            const clickedButton = event && event.target
+                ? event.target
+                : document.querySelector(".nav-btn[onclick=\"switchTab('" + tabName + "')\"]");
+
+            if (clickedButton) {
+                clickedButton.classList.add('active');
+            }
+        }
+
+        function showTrackerFeedback(message, type) {
+            const feedback = document.getElementById('tracker-feedback');
+            if (!feedback) {
+                return;
+            }
+
+            feedback.textContent = message;
+            feedback.classList.remove('success', 'error');
+            feedback.classList.add('show', type);
+        }
+
+        async function handleTrackerAction(statusGroup, actionLabel, buttonEl) {
+            const button = buttonEl || null;
+            const originalText = button ? button.textContent : '';
+
+            if (button) {
+                button.disabled = true;
+                button.textContent = 'Submitting...';
+            }
+
+            try {
+                const response = await fetch(API_BASE_URL + '/tracker/action', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        status_group: statusGroup,
+                        action_label: actionLabel,
+                        source: 'dashboard-status-tracker'
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Unable to create action task');
+                }
+
+                const result = await response.json();
+                const taskId = result.task ? result.task.task_id : 'N/A';
+                showTrackerFeedback('Action created successfully. Task ID: ' + taskId + ' | ' + actionLabel + ' for ' + statusGroup + '.', 'success');
+            } catch (error) {
+                showTrackerFeedback('Action could not be sent to backend. Start the API server on http://localhost:5000 to enable workflow actions.', 'error');
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.textContent = originalText;
+                }
+            }
+        }
+    </script>
+</body>
+</html>
