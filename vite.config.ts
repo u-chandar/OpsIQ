@@ -16,7 +16,9 @@ function figmaAssetResolver() {
   }
 }
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
+  // Use repo subpath in production so assets resolve on GitHub Pages.
+  base: command === 'build' ? '/OpsIQ/' : '/',
   plugins: [
     figmaAssetResolver(),
     // The React and Tailwind plugins are both required for Make, even if
@@ -29,4 +31,4 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src/app'),
     },
   },
-})
+}))
